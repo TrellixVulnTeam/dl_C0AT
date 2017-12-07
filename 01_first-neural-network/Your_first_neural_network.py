@@ -316,13 +316,13 @@ unittest.TextTestRunner().run(suite)
 # 
 # 隐藏节点越多，模型的预测结果就越准确。尝试不同的隐藏节点的数量，看看对性能有何影响。你可以查看损失字典，寻找网络性能指标。如果隐藏单元的数量太少，那么模型就没有足够的空间进行学习，如果太多，则学习方向就有太多的选择。选择隐藏单元数量的技巧在于找到合适的平衡点。
 
-# In[110]:
+# In[114]:
 
 import sys
 from time import time
 
 ### Set the hyperparameters here ###
-iterations = 15000
+iterations = 10000
 learning_rate = 0.004
 hidden_nodes = 15
 output_nodes = 1
@@ -352,7 +352,7 @@ for ii in range(iterations):
 print("\n", network.weights_hidden_to_output[:5], "\n cost time: ", time() - start)
 
 
-# In[112]:
+# In[115]:
 
 plt.plot(losses['train'], label='Training loss')
 plt.plot(losses['validation'], label='Validation loss')
