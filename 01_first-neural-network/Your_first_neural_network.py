@@ -127,7 +127,7 @@ val_features, val_targets = features[-60*24:], targets[-60*24:]
 # 
 #   
 
-# In[9]:
+# In[85]:
 
 class NeuralNetwork(object):
     def __init__(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
@@ -172,6 +172,7 @@ class NeuralNetwork(object):
         n_records = features.shape[0]
         delta_weights_i_h = np.zeros(self.weights_input_to_hidden.shape)
         delta_weights_h_o = np.zeros(self.weights_hidden_to_output.shape)
+        a = 1
         for X, y in zip(features, targets):
             #### Implement the forward pass here ####
             ### Forward pass ###
@@ -187,12 +188,13 @@ class NeuralNetwork(object):
             ### Backward pass ###
 
             # TODO: Output error - Replace this value with your calculations.
-            error = y - final_outputs # (1,) Output layer error is the difference between desired target and actual output.
-            output_error_term = error # (1,)
+            error = y - final_outputs # Output layer error is the difference between desired target and actual output.
             
             # TODO: Calculate the hidden layer's contribution to the error
-            hidden_error = np.dot(output_error_term[0], self.weights_hidden_to_output.ravel())
+            hidden_error = np.dot(error[0], self.weights_hidden_to_output.ravel())
+            
             # TODO: Backpropagated error terms - Replace these values with your calculations.
+            output_error_term = error
             hidden_error_term = hidden_error * hidden_outputs * (1 - hidden_outputs)
 
             # Weight step (input to hidden)
@@ -223,7 +225,7 @@ class NeuralNetwork(object):
         return final_outputs
 
 
-# In[10]:
+# In[86]:
 
 def MSE(y, Y):
     return np.mean((y-Y)**2)
@@ -233,7 +235,7 @@ def MSE(y, Y):
 # 
 # 运行这些单元测试，检查你的网络实现是否正确。这样可以帮助你确保网络已正确实现，然后再开始训练网络。这些测试必须成功才能通过此项目。
 
-# In[11]:
+# In[87]:
 
 import unittest
 
@@ -314,26 +316,27 @@ unittest.TextTestRunner().run(suite)
 # 
 # 隐藏节点越多，模型的预测结果就越准确。尝试不同的隐藏节点的数量，看看对性能有何影响。你可以查看损失字典，寻找网络性能指标。如果隐藏单元的数量太少，那么模型就没有足够的空间进行学习，如果太多，则学习方向就有太多的选择。选择隐藏单元数量的技巧在于找到合适的平衡点。
 
-# In[36]:
+# In[110]:
 
 import sys
+from time import time
 
 ### Set the hyperparameters here ###
-iterations = 1000
-learning_rate = 0.1
-hidden_nodes = 50
+iterations = 15000
+learning_rate = 0.004
+hidden_nodes = 15
 output_nodes = 1
 
 N_i = train_features.shape[1]
 network = NeuralNetwork(N_i, hidden_nodes, output_nodes, learning_rate)
 
+start = time()
+print("\n", network.weights_hidden_to_output[:5])
 losses = {'train':[], 'validation':[]}
 for ii in range(iterations):
     # Go through a random batch of 128 records from the training data set
     batch = np.random.choice(train_features.index, size=128)
     X, y = train_features.ix[batch].values, train_targets.ix[batch]['cnt']
-#     if ii == 0:
-#         print(type(X), type(y.as_matrix()), X, y.as_matrix().reshape(.shape[0], 1))
     y = y.as_matrix()                         
     network.train(X, y.reshape(y.shape[0], 1))
     
@@ -345,21 +348,24 @@ for ii in range(iterations):
     
     losses['train'].append(train_loss)
     losses['validation'].append(val_loss)
+    
+print("\n", network.weights_hidden_to_output[:5], "\n cost time: ", time() - start)
 
 
-# In[37]:
+# In[112]:
 
 plt.plot(losses['train'], label='Training loss')
 plt.plot(losses['validation'], label='Validation loss')
 plt.legend()
-_ = plt.ylim()
+# _ = plt.ylim()
+_ = plt.ylim(ymax=20000, ymin=0)
 
 
 # ## 检查预测结果
 # 
 # 使用测试数据看看网络对数据建模的效果如何。如果完全错了，请确保网络中的每步都正确实现。
 
-# In[38]:
+# In[113]:
 
 fig, ax = plt.subplots(figsize=(8,4))
 
