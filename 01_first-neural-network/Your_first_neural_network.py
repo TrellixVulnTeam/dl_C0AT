@@ -127,7 +127,7 @@ val_features, val_targets = features[-60*24:], targets[-60*24:]
 # 
 #   
 
-# In[85]:
+# In[9]:
 
 class NeuralNetwork(object):
     def __init__(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
@@ -225,7 +225,7 @@ class NeuralNetwork(object):
         return final_outputs
 
 
-# In[86]:
+# In[10]:
 
 def MSE(y, Y):
     return np.mean((y-Y)**2)
@@ -235,7 +235,7 @@ def MSE(y, Y):
 # 
 # 运行这些单元测试，检查你的网络实现是否正确。这样可以帮助你确保网络已正确实现，然后再开始训练网络。这些测试必须成功才能通过此项目。
 
-# In[87]:
+# In[102]:
 
 import unittest
 
@@ -322,23 +322,22 @@ import sys
 from time import time
 
 ### Set the hyperparameters here ###
-iterations = 10000
-learning_rate = 0.004
-hidden_nodes = 15
+iterations = 5000
+learning_rate = 0.8
+hidden_nodes = 10
 output_nodes = 1
 
 N_i = train_features.shape[1]
 network = NeuralNetwork(N_i, hidden_nodes, output_nodes, learning_rate)
 
 start = time()
-print("\n", network.weights_hidden_to_output[:5])
 losses = {'train':[], 'validation':[]}
 for ii in range(iterations):
     # Go through a random batch of 128 records from the training data set
     batch = np.random.choice(train_features.index, size=128)
     X, y = train_features.ix[batch].values, train_targets.ix[batch]['cnt']
-    y = y.as_matrix()                         
-    network.train(X, y.reshape(y.shape[0], 1))
+    # y = y.as_matrix()                         
+    network.train(X, y.values.reshape(y.shape[0], 1))
     
     # Printing out the training progress
     train_loss = MSE(network.run(train_features).T, train_targets['cnt'].values)
@@ -352,20 +351,20 @@ for ii in range(iterations):
 print("\n", network.weights_hidden_to_output[:5], "\n cost time: ", time() - start)
 
 
-# In[115]:
+# In[116]:
 
 plt.plot(losses['train'], label='Training loss')
 plt.plot(losses['validation'], label='Validation loss')
 plt.legend()
 # _ = plt.ylim()
-_ = plt.ylim(ymax=20000, ymin=0)
+_ = plt.ylim(ymax=50000, ymin=0)
 
 
 # ## 检查预测结果
 # 
 # 使用测试数据看看网络对数据建模的效果如何。如果完全错了，请确保网络中的每步都正确实现。
 
-# In[113]:
+# In[117]:
 
 fig, ax = plt.subplots(figsize=(8,4))
 
